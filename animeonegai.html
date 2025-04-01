@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Onegai - Llamatico</title>
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1a1a1a;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+        
+        .back-btn {
+            background-color: #ff6b00;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: #e05a00;
+        }
+        
+        .title-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ff6b00;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .player-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+        
+        /* Personalización VERDE del reproductor */
+        .plyr--video .plyr__controls {
+            --plyr-color-main: #4CAF50;
+            --plyr-control-radius: 8px;
+            --plyr-video-control-background-hover: #388E3C;
+        }
+        .plyr__progress__buffer {
+            background: #2E7D32 !important;
+        }
+        .plyr--full-ui input[type="range"] {
+            color: #4CAF50 !important;
+        }
+        
+        .program-info {
+            margin-top: 20px;
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .program-info h2 {
+            color: #ff6b00;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .program-info p {
+            color: #cccccc;
+            line-height: 1.5;
+        }
+        
+        .schedule {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+        
+        .schedule h2 {
+            color: #ff6b00;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .schedule-item {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .schedule-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .schedule-item h3 {
+            color: #ff6b00;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .schedule-item p {
+            color: #aaaaaa;
+            font-size: 0.9rem;
+        }
+        
+        .time {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .status-message {
+            color: white;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="assets/logo/logo.png" alt="Logo" class="logo">
+        <a href="index.html" class="back-btn">Volver al Inicio</a>
+    </header>
+    
+    <section class="title-section">
+        <h1>ANIME ONEGAI</h1>
+    </section>
+    
+    <div class="player-container">
+        <div class="video-container">
+            <video id="player" playsinline controls>
+                <source src="https://live-evg25.tv360.bitel.com.pe/bitel/animeOnegai/playlist.m3u8?uid=6976552" type="application/x-mpegURL">
+            </video>
+        </div>
+        <p class="status-message" id="status">Cargando transmisión...</p>
+        
+        <div class="program-info">
+            <h2>Programa Actual</h2>
+            <p id="current-program">Cargando información del anime...</p>
+        </div>
+    </div>
+    
+    <div class="schedule">
+        <h2>Programación del Día</h2>
+        <div class="schedule-grid" id="schedule">
+            <!-- Programación típica de anime (personaliza los horarios) -->
+            <div class="schedule-item">
+                <h3>One Piece</h3>
+                <p><span class="time">08:00</span> - 08:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>Naruto Shippuden</h3>
+                <p><span class="time">09:00</span> - 09:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>Demon Slayer</h3>
+                <p><span class="time">10:00</span> - 10:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>Jujutsu Kaisen</h3>
+                <p><span class="time">11:00</span> - 11:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>Attack on Titan</h3>
+                <p><span class="time">12:00</span> - 12:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>My Hero Academia</h3>
+                <p><span class="time">13:00</span> - 13:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>Dragon Ball Super</h3>
+                <p><span class="time">14:00</span> - 14:30</p>
+            </div>
+            <div class="schedule-item">
+                <h3>Tokyo Revengers</h3>
+                <p><span class="time">15:00</span> - 15:30</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plyr JS + HLS.js -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('player');
+            const statusElement = document.getElementById('status');
+            const streamUrl = 'https://live-evg25.tv360.bitel.com.pe/bitel/animeOnegai/playlist.m3u8?uid=6976552';
+            
+            // 1. Configurar HLS
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    enableWorker: false,
+                    lowLatencyMode: true
+                });
+                
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    statusElement.textContent = "Transmisión cargada correctamente";
+                    initPlyr();
+                });
+                
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        statusElement.textContent = "Error con HLS. Probando método nativo...";
+                        tryNativeHLS();
+                    }
+                });
+            } else {
+                tryNativeHLS();
+            }
+            
+            // 2. Método nativo para Safari
+            function tryNativeHLS() {
+                if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = streamUrl;
+                    video.addEventListener('loadedmetadata', () => {
+                        statusElement.textContent = "Transmisión lista (Safari)";
+                        initPlyr();
+                    });
+                } else {
+                    statusElement.textContent = "Error: Navegador no compatible. Usa Chrome/Firefox/Safari.";
+                }
+            }
+            
+            // 3. Inicializar Plyr
+            function initPlyr() {
+                new Plyr(video, {
+                    controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                    autoplay: true
+                });
+            }
+
+            // Actualizar anime actual según hora
+            function updateCurrentAnime() {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinutes = now.getMinutes();
+                const currentTime = currentHour * 60 + currentMinutes;
+                
+                const schedule = [
+                    { name: "One Piece", start: 8*60, end: 8*60+30 },
+                    { name: "Naruto Shippuden", start: 9*60, end: 9*60+30 },
+                    { name: "Demon Slayer", start: 10*60, end: 10*60+30 },
+                    { name: "Jujutsu Kaisen", start: 11*60, end: 11*60+30 },
+                    { name: "Attack on Titan", start: 12*60, end: 12*60+30 },
+                    { name: "My Hero Academia", start: 13*60, end: 13*60+30 },
+                    { name: "Dragon Ball Super", start: 14*60, end: 14*60+30 },
+                    { name: "Tokyo Revengers", start: 15*60, end: 15*60+30 }
+                ];
+
+                const currentAnime = schedule.find(anime => 
+                    currentTime >= anime.start && currentTime < anime.end
+                );
+
+                if (currentAnime) {
+                    document.getElementById('current-program').textContent = currentAnime.name;
+                } else {
+                    document.getElementById('current-program').textContent = "Transmisión especial";
+                }
+            }
+
+            updateCurrentAnime();
+            setInterval(updateCurrentAnime, 60000); // Actualizar cada minuto
+        });
+    </script>
+</body>
+</html>
