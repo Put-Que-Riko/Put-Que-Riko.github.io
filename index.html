@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llamatico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Menú hamburguesa */
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: #ff6b00;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .menu-btn span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: all 0.3s;
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            right: -50%;
+            width: 50%;
+            height: 100%;
+            background: #1a1a1a;
+            z-index: 999;
+            transition: right 0.3s;
+            padding: 80px 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        }
+        
+        .menu-overlay.active {
+            right: 0;
+        }
+        
+        .menu-overlay a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            margin: 10px 0;
+            background: #2a2a2a;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .menu-overlay a:hover {
+            background: #ff6b00;
+        }
+        
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ff6b00;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+        }
+        
+        .title-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ff6b00;
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background-color: #ff6b00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .btn:hover {
+            background-color: #e05a00;
+        }
+        
+        .btn-latina { background-color: #ff6b00; }
+        .btn-america { background-color: #4CAF50; }
+        .btn-anime { background-color: #9C27B0; }
+        
+        .carousel-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            overflow: hidden;
+        }
+        
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .carousel img {
+            min-width: 100%;
+            height: 400px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .carousel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .prev {
+            left: 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .next {
+            right: 0;
+            border-radius: 5px 0 0 5px;
+        }
+        
+        .carousel-indicator {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .indicator-btn {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        
+        .indicator-btn.active {
+            background-color: #ff6b00;
+        }
+        
+        .tops-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .tops-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff6b00;
+        }
+        
+        .tops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .top-item {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .top-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .top-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        
+        .top-item-info {
+            padding: 10px;
+        }
+        
+        .top-item h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .top-item p {
+            font-size: 0.8rem;
+            color: #aaaaaa;
+        }
+        
+        .gif-container {
+            margin: 40px auto;
+            max-width: 300px;
+            text-align: center;
+        }
+        
+        .gif-container video {
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .carousel img {
+                height: 300px;
+            }
+            
+            .tops-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .menu-overlay {
+                width: 80%;
+                right: -80%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                height: 40px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .carousel img {
+                height: 200px;
+            }
+            
+            .carousel-btn {
+                width: 30px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            .tops-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Menú Hamburguesa -->
+    <div class="menu-btn" id="menuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <div class="menu-overlay" id="menuOverlay">
+        <a href="#" id="searchLink">Buscar</a>
+        <a href="#" id="topsLink">Tops</a>
+        <a href="#" id="moviesLink">Películas</a>
+        <a href="#" id="seriesLink">Series</a>
+        <a href="#" id="newsLink">Noticias</a>
+    </div>
+
+    <header>
+        <img src="assets/logo/logo.png" alt="Logo" class="logo" onclick="window.location.href='index.html'">
+    </header>
+    
+    <section class="title-section">
+        <h1>Llamatico</h1>
+    </section>
+    
+    <div class="carousel-container">
+        <div class="carousel">
+            <!-- Imágenes de la ruleta -->
+            <img src="assets/ruleta/1.png" alt="Imagen 1" onclick="window.location.href='imagen1.html'">
+            <img src="assets/ruleta/2.png" alt="Imagen 2" onclick="window.location.href='imagen2.html'">
+            <img src="assets/ruleta/3.png" alt="Imagen 3" onclick="window.location.href='imagen3.html'">
+            <img src="assets/ruleta/4.png" alt="Imagen 4" onclick="window.location.href='imagen4.html'">
+            <img src="assets/ruleta/5.png" alt="Imagen 5" onclick="window.location.href='imagen5.html'">
+            <img src="assets/ruleta/6.png" alt="Imagen 6" onclick="window.location.href='imagen6.html'">
+            <img src="assets/ruleta/7.png" alt="Imagen 7" onclick="window.location.href='imagen7.html'">
+            <img src="assets/ruleta/8.png" alt="Imagen 8" onclick="window.location.href='imagen8.html'">
+            <img src="assets/ruleta/9.png" alt="Imagen 9" onclick="window.location.href='imagen9.html'">
+            <img src="assets/ruleta/10.png" alt="Imagen 10" onclick="window.location.href='imagen10.html'">
+        </div>
+        
+        <button class="carousel-btn prev">&#10094;</button>
+        <button class="carousel-btn next">&#10095;</button>
+        
+        <div class="carousel-indicator">
+            <!-- Indicadores se generarán con JavaScript -->
+        </div>
+    </div>
+    
+    <div class="btn-container">
+        <a href="latina.html" class="btn btn-latina">Latina TV</a>
+        <a href="america.html" class="btn btn-america">América TV</a>
+        <a href="animeonegai.html" class="btn btn-anime">Anime Onegai</a>
+    </div>
+    
+    <section class="tops-section">
+        <h2>Tops en Vivo</h2>
+        <div class="tops-grid">
+            <div class="top-item">
+                <img src="assets/tops/top1.jpg" alt="Top 1">
+                <div class="top-item-info">
+                    <h3>Top 1</h3>
+                    <p>Descripción del top 1</p>
+                </div>
+            </div>
+            <div class="top-item">
+                <img src="assets/tops/top2.jpg" alt="Top 2">
+                <div class="top-item-info">
+                    <h3>Top 2</h3>
+                    <p>Descripción del top 2</p>
+                </div>
+            </div>
+            <div class="top-item">
+                <img src="assets/tops/top3.jpg" alt="Top 3">
+                <div class="top-item-info">
+                    <h3>Top 3</h3>
+                    <p>Descripción del top 3</p>
+                </div>
+            </div>
+            <div class="top-item">
+                <img src="assets/tops/top4.jpg" alt="Top 4">
+                <div class="top-item-info">
+                    <h3>Top 4</h3>
+                    <p>Descripción del top 4</p>
+                </div>
+            </div>
+            <div class="top-item">
+                <img src="assets/tops/top5.jpg" alt="Top 5">
+                <div class="top-item-info">
+                    <h3>Top 5</h3>
+                    <p>Descripción del top 5</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="gif-container">
+        <video autoplay loop muted>
+            <source src="assets/gif/1.mp4" type="video/mp4">
+        </video>
+    </div>
+    
+    <script>
+        // Loader
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2000);
+        });
+        
+        // Menú Hamburguesa
+        const menuBtn = document.getElementById('menuBtn');
+        const menuOverlay = document.getElementById('menuOverlay');
+        
+        menuBtn.addEventListener('click', function() {
+            menuOverlay.classList.toggle('active');
+            menuBtn.classList.toggle('active');
+        });
+        
+        // Cerrar menú al hacer clic en un enlace
+        const menuLinks = document.querySelectorAll('.menu-overlay a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                menuOverlay.classList.remove('active');
+                menuBtn.classList.remove('active');
+            });
+        });
+        
+        // Ruleta de imágenes
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.querySelector('.carousel');
+            const images = document.querySelectorAll('.carousel img');
+            const prevBtn = document.querySelector('.prev');
+            const nextBtn = document.querySelector('.next');
+            const indicatorContainer = document.querySelector('.carousel-indicator');
+            
+            let currentIndex = 0;
+            const totalImages = images.length;
+            
+            // Crear indicadores
+            for (let i = 0; i < totalImages; i++) {
+                const indicator = document.createElement('button');
+                indicator.classList.add('indicator-btn');
+                if (i === 0) indicator.classList.add('active');
+                indicator.addEventListener('click', () => goToImage(i));
+                indicatorContainer.appendChild(indicator);
+            }
+            
+            const indicators = document.querySelectorAll('.indicator-btn');
+            
+            function updateCarousel() {
+                carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            function goToImage(index) {
+                currentIndex = index;
+                updateCarousel();
+                resetAutoScroll();
+            }
+            
+            function nextImage() {
+                currentIndex = (currentIndex + 1) % totalImages;
+                updateCarousel();
+                resetAutoScroll();
+            }
+            
+            function prevImage() {
+                currentIndex = (currentIndex - 1 + totalImages) % totalImages;
+                updateCarousel();
+                resetAutoScroll();
+            }
+            
+            function resetAutoScroll() {
+                clearInterval(interval);
+                interval = setInterval(nextImage, 5000);
+            }
+            
+            nextBtn.addEventListener('click', nextImage);
+            prevBtn.addEventListener('click', prevImage);
+            
+            let interval = setInterval(nextImage, 5000);
+            
+            // Pausar al interactuar
+            carousel.addEventListener('mouseenter', () => clearInterval(interval));
+            carousel.addEventListener('mouseleave', () => interval = setInterval(nextImage, 5000));
+            
+            // Para dispositivos táctiles
+            carousel.addEventListener('touchstart', () => clearInterval(interval));
+            carousel.addEventListener('touchend', () => interval = setInterval(nextImage, 5000));
+        });
+    </script>
+</body>
+</html>
